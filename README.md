@@ -8,4 +8,7 @@ Ananda Affan Fattahila <sup>4</sup><br>
 <sup>3</sup><a href="rhabiy@student.telkomuniversity.ac.id">rhabiy@student.telkomuniversity.ac.id</a><br>
 <sup>4</sup><a href="affanfattahila@student.telkomuniversity.ac.id">affanfattahila@student.telkomuniversity.ac.id</a><br>
 Informatics Engineering, Telkom University, Indonesia<br>
-2021
+2021  
+
+
+Penggunaan Algoritma Greedy dalam Perencanaan Rute Perjalanan Sederhana dengan Beberapa Destinasi
