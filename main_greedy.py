@@ -27,7 +27,7 @@ class tempat:
 def greedy(list_destinasi) -> []:
     # IS: Terdefinisi list_destiniasi yang merupakan list dari tempat-tempat yang sudah didefinisikan
     # FS: Mengembalikan list yang berisi pola sirkuit terpendek untuk menuju suatu tempat2.
-    rute_akhir = [3] # [1, 0, 2, 3, 4, 5]
+    rute_akhir = [0] # [1, 0, 2, 3, 4, 5]
     for i in range(len(list_destinasi)-1):
         if len(rute_akhir) == 1:
             next_destinasi_kanan = list_destinasi[rute_akhir[0]].jarakMinimumSelainList(rute_akhir)
@@ -38,7 +38,7 @@ def greedy(list_destinasi) -> []:
             if next_destinasi_kanan[1] >= next_destinasi_kiri[1]:
                 rute_akhir.insert(0,next_destinasi_kiri[0])
             else:
-                rute_akhir.append(next_destinasi_kanan[0])   
+                rute_akhir.append(next_destinasi_kanan[0])
     return rute_akhir
         
 if __name__ == "__main__":
@@ -50,8 +50,12 @@ if __name__ == "__main__":
     # 5 [2, 6, 6, 3, 0, 5]
     # 6 [6, 1, 5, 10, 5, 0]
 
-    test_case = [ ['satu', [0, 6, 7, 4, 2, 6]], ['dua', [6, 0, 8, 5, 6, 1]], ['tiga', [7, 8, 0, 8, 6, 5]], 
-                ['empat', [4, 5, 8, 0, 3, 10]], ['lima', [2, 6, 6, 3, 0, 5]], ['enam', [6, 1, 5, 10, 5, 0]]]
+    test_case = [['kebumen',        [0, 70, 43.5, 49.3, 89, 70]], 
+                 ['wonosobo',       [70, 0, 53.7, 46.7, 60, 87.3]], 
+                 ['purworejo',      [43.5, 53.7, 0, 93.1, 43, 112]], 
+                 ['banjarnegara',   [49.3, 46.7, 93.1, 0, 97.8, 40.3]], 
+                 ['magelang',       [89, 60, 49, 97.8, 0, 144]], 
+                 ['purwokerto',     [70, 87.3, 112, 40.3, 144, 0]]]
     
     list_destinasi_asli = []
     
