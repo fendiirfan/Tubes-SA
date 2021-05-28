@@ -31,3 +31,11 @@ Anda sudah siap untuk menjalankan program kami degnan menggunakan:
 ```
 python main.py
 ```
+
+## Test Case (No API, No Library)
+
+Untuk menjalankan test case, dapat dilakukan dengan command
+
+```
+python main_greedy.py
+```
