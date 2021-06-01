@@ -1,12 +1,14 @@
 # import library
 import requests
 import json
+from colorama import Fore, Style
 
 from dotenv import load_dotenv
 
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+from os import system
 
 dotenv_path = join(dirname(__file__), ".env")
 load_dotenv(dotenv_path)
@@ -31,11 +33,16 @@ def getCityNameCoordinate(city: str):
     # FS: Mengembalikan Nama Kota Secara Rinci dan Koordinat kota Tersebut menggunakan OpenRouteService API
     response = requests.get(getCoordinateLink + city)
     res_json = response.json()
+
+    if len(res_json["features"]) == 0:
+        return []
+
     city_name = "{}, {}, {}".format(
         res_json["features"][0]["properties"]["name"],
         res_json["features"][0]["properties"]["region"],
         res_json["features"][0]["properties"]["country"],
     )
+
     coordinate = res_json["features"][0]["geometry"]["coordinates"]
     return [city_name, coordinate]
 
@@ -110,6 +117,15 @@ class tempat:
                     minimum = i
                 if (self.jarak[i] <= self.jarak[minimum]) and (i not in list_rute):
                     minimum = i
+
+        print("Jarak Minimum dari Kota {}".format(self.nama))
+        print("[", end=" ")
+        for i in range(len(self.jarak)):
+            if i == minimum:
+                print(Fore.GREEN, self.jarak[i], Fore.WHITE, end=" ")
+            else:
+                print(self.jarak[i], end=" ")
+        print("]")
         return [minimum, self.jarak[minimum]]  # (index, jarak_aktual)
 
     def printTempat(self):
@@ -119,24 +135,55 @@ class tempat:
 def greedy(list_destinasi):
     # IS: Terdefinisi list_destiniasi yang merupakan list dari tempat-tempat yang sudah didefinisikan
     # FS: Mengembalikan list yang berisi pola sirkuit terpendek untuk menuju suatu tempat2.
+
+    # list_destinasi merupakan list yang berisi objek destinasi original
+    # rute_akhir merupakan list yang berisi pola hasil greedy yang berbentuk index dari list_destinasi
+    print("\n\n")
+    print(Fore.RED, "GREEDY BY DISTANCE", Fore.WHITE)
     rute_akhir = [0]  # [1, 0, 2, 3, 4, 5]
     for i in range(len(list_destinasi) - 1):
+        print(Fore.RED, "=======================", Fore.WHITE)
+        print("ITERASI {}".format(i + 1))
         if len(rute_akhir) == 1:
             next_destinasi_kanan = list_destinasi[rute_akhir[0]].jarakMinimumSelainList(
                 rute_akhir
             )
+            print(
+                "Terpilih {} dari {} dengan jarak {}".format(
+                    list_destinasi[next_destinasi_kanan[0]].nama,
+                    list_destinasi[rute_akhir[len(rute_akhir) - 1]].nama,
+                    next_destinasi_kanan[1],
+                )
+            )
             rute_akhir.append(next_destinasi_kanan[0])
         else:
+            print("Node Kanan")
             next_destinasi_kanan = list_destinasi[
                 rute_akhir[len(rute_akhir) - 1]
             ].jarakMinimumSelainList(rute_akhir)
+            print("Node Kiri")
             next_destinasi_kiri = list_destinasi[rute_akhir[0]].jarakMinimumSelainList(
                 rute_akhir
             )
             if next_destinasi_kanan[1] >= next_destinasi_kiri[1]:
+                print(
+                    "Terpilih {} dari {} dengan jarak {}".format(
+                        list_destinasi[next_destinasi_kiri[0]].nama,
+                        list_destinasi[rute_akhir[0]].nama,
+                        next_destinasi_kiri[1],
+                    )
+                )
                 rute_akhir.insert(0, next_destinasi_kiri[0])
             else:
+                print(
+                    "Terpilih {} dari {} dengan jarak {}".format(
+                        list_destinasi[next_destinasi_kanan[0]].nama,
+                        list_destinasi[rute_akhir[len(rute_akhir) - 1]].nama,
+                        next_destinasi_kanan[1],
+                    )
+                )
                 rute_akhir.append(next_destinasi_kanan[0])
+    print(Fore.BLUE, "============== GREEDY FINISH ==============", Fore.WHITE)
     return rute_akhir
 
 
@@ -144,13 +191,14 @@ def greedy(list_destinasi):
 
 if __name__ == "__main__":
     # initialization
-    city_list = []
     city_list_for_greedy = []
     input_cities_state = True
 
     # ===================================== GETTING CITY AND DISTANCE MATRIX =================================
     # Input kota-kota yang diinginkan
     while input_cities_state:
+        city_list = []
+
         print("Inputting Cities")
         bool_input_ulang = True
         input_counter = 0
@@ -161,6 +209,7 @@ if __name__ == "__main__":
             try:
                 if input_city != "-1" and input_city != "del":
                     temp_city = getCityNameCoordinate(input_city)
+                    assert len(temp_city) != 0
                     print(temp_city)
                     city_list.append(temp_city)
                     print("===============")
@@ -169,7 +218,7 @@ if __name__ == "__main__":
                     city_list.pop(len(city_list) - 1)
                 else:
                     bool_input_ulang = False
-            except (RuntimeError, TypeError, NameError):
+            except:
                 print("Error when getting city")
 
         # Ambil matrix jarak dari Koordinat-Koordinat Kota yang sudah diinputkan
@@ -192,7 +241,9 @@ if __name__ == "__main__":
             print("Input Kota Tidak Valid, Coba untuk lebih spesifik")
 
     # ===================================== GREEDY ALGORITHM =================================
+    system("cls" if os.name == "nt" else "clear")
 
+    print("List Kota")
     for i in range(len(city_list)):
         destinasi_temp = tempat(i, city_list[i][0], city_list[i][1], city_list[i][2])
         city_list_for_greedy.append(destinasi_temp)
@@ -202,6 +253,8 @@ if __name__ == "__main__":
         city_list_for_greedy[i].printTempat()
 
     list_pola_destinasi_greedy = greedy(city_list_for_greedy)
+
+    print("\n\n Pola Kota yang Didapatkan")
     print("=======================================")
     for i in range(len(list_pola_destinasi_greedy)):
         city_list_for_greedy[list_pola_destinasi_greedy[i]].printTempat()
