@@ -17,7 +17,8 @@ API_KEY = os.environ.get("API")
 getCoordinateLink = (
     "https://api.openrouteservice.org/geocode/search?api_key={}&text=".format(
         API_KEY))
-getMatrixLink = "https://api.openrouteservice.org/v2/matrix/foot-hiking"
+getMatrixLinkFootHiking = "https://api.openrouteservice.org/v2/matrix/foot-hiking"
+getMatrixLinkDrivingCar = "https://api.openrouteservice.org/v2/matrix/driving-car"
 
 
 # =========================================== API ==============================================
@@ -47,7 +48,7 @@ def getCityNameCoordinate(city: str):
     return [city_name, coordinate]
 
 
-def getMatrixDistance(cities_coordinate_array):
+def getMatrixDistance(post_link, cities_coordinate_array):
     # IS: Memasukkan array dari semua kota yang terdaftar
     # FS: Mengembalikan matrix Jarak Antar Kota menggunakan OpenRouteService API
 
@@ -67,7 +68,7 @@ def getMatrixDistance(cities_coordinate_array):
     }
 
     response = requests.post(
-        getMatrixLink,
+        post_link,
         json=body,
         headers=headers,
     )
@@ -243,10 +244,18 @@ if __name__ == "__main__":
         list_koordinat = []
         for i in range(len(city_list)):
             list_koordinat.append(city_list[i][1])
+            
         try:
-            matrix_jarak = getMatrixDistance(list_koordinat)
+            matrix_jarak = getMatrixDistance(getMatrixLinkDrivingCar ,list_koordinat)
         except (RuntimeError, TypeError, NameError):
             print("Error when getting a Distance Matrix")
+        
+        if len(matrix_jarak) == 0:
+            try:
+                matrix_jarak = getMatrixDistance(getMatrixLinkFootHiking, list_koordinat)
+            except:
+                print("Error when getting a Distance Matrix")
+            
         ## Memasukkan matrix ke dalam city list
         if len(matrix_jarak) != 0:
             input_cities_state = False
